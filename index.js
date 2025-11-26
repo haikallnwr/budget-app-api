@@ -8,6 +8,7 @@ const app = express();
 
 const authRoute = require("./routers/authRoute");
 const transactionRoute = require("./routers/transactionRoute");
+const userRoute = require("./routers/userRoute");
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,7 @@ connectDB();
 
 app.use("/api/auth", authRoute);
 app.use("/api/transactions", transactionRoute);
+app.use("/api/user", userRoute);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

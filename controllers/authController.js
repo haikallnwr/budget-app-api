@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const Category = require("../models/Category");
+const Category = require("../models/category");
 const jwt = require("jsonwebtoken");
 const { doHash, doHashValidation } = require("../utils/hashing");
 
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.status(200).json({
       message: "Login Successful",
