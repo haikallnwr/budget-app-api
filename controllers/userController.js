@@ -27,6 +27,10 @@ exports.getUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const update = await User.findByIdAndUpdate(req.user._id, req.body, { new: true });
+
+    if (req.body.password) {
+      return res.status(400).json({ message: "Password cannot be updated here" });
+    }
     res.json({ update });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -67,3 +67,36 @@ exports.login = async (req, res) => {
 exports.logout = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Old and new password are required" });
+    }
+
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const matchPassword = await doHashValidation(oldPassword, user.password);
+    if (!matchPassword) {
+      return res.status(400).json({ message: "Old password doesn't match" });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ message: "New password must be different from old password" });
+    }
+
+    const hashed = doHash(newPassword, 12);
+    user.password = hashed;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password updated" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
