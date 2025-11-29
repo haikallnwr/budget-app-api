@@ -60,13 +60,32 @@ exports.getTransactionById = async (req, res) => {
 
 exports.updateTransaction = async (req, res) => {
   try {
-    const updated = await Transaction.findOneAndUpdate({ _id: req.params.id, user_id: req.user._id }, req.body, { new: true });
+    const oldTransaction = await Transaction.findOne({ _id: req.params.id, user_id: req.user._id });
 
-    if (!updated) {
+    if (!oldTransaction) {
       return res.status(404).json({ message: "Transaction not found" });
     }
 
-    res.status(200).json({ message: "Transaction updated", transaction: updated });
+    const oldAccount = await Account.findById(oldTransaction.account_id);
+
+    if (oldTransaction.type === "Income") {
+      oldAccount.current_balance -= oldTransaction.amount;
+    } else {
+      oldAccount.current_balance += oldTransaction.amount;
+    }
+    await oldAccount.save();
+
+    const updateTransaction = await Transaction.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    const newAccount = await Account.findById(updateTransaction.account_id);
+
+    if (updateTransaction.type === "Income") {
+      newAccount.current_balance += updateTransaction.amount;
+    } else {
+      newAccount.current_balance -= updateTransaction.amount;
+    }
+    await newAccount.save();
+    res.status(200).json({ message: "Transaction updated", transaction: updateTransaction });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -74,14 +93,29 @@ exports.updateTransaction = async (req, res) => {
 
 exports.deleteTransaction = async (req, res) => {
   try {
-    const deleted = await Transaction.findOneAndDelete({
+    const transaction = await Transaction.findOne({
       _id: req.params.id,
       user_id: req.user._id,
     });
 
-    if (!deleted) {
+    if (!transaction) {
       return res.status(404).json({ message: "Transaction not found" });
     }
+
+    const account = await Account.findById(transaction.account_id);
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    if (transaction.type === "Income") {
+      account.current_balance -= transaction.amount;
+    } else {
+      account.current_balance += transaction.amount;
+    }
+
+    await account.save();
+
+    await transaction.deleteOne();
 
     res.status(200).json({ message: "Transaction deleted" });
   } catch (error) {

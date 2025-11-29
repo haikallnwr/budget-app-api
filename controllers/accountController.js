@@ -55,7 +55,7 @@ exports.updateAccount = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
   try {
     const account = await Account.findOne({
-      _id: req.params._id,
+      _id: req.params.id,
       user_id: req.user._id,
     });
 
