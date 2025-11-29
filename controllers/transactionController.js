@@ -2,9 +2,8 @@ const Transaction = require("../models/transaction");
 const Account = require("../models/account");
 
 exports.createTransaction = async (req, res) => {
-  const { account_id, category_id, type, amount, description, date } = req.body;
-
   try {
+    const { account_id, category_id, type, amount, description, date } = req.body;
     const newTransaction = new Transaction({
       user_id: req.user._id,
       account_id,

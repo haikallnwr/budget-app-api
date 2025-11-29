@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const Category = require("../models/category");
+const Account = require("../models/account");
 const jwt = require("jsonwebtoken");
 const { doHash, doHashValidation } = require("../utils/hashing");
 
@@ -27,6 +27,14 @@ exports.register = async (req, res) => {
     });
 
     const savedUser = await newUser.save();
+    await Account.create({
+      user_id: savedUser._id,
+      name: "Cash",
+      type: "Cash",
+      init_balance: 0,
+      current_balance: 0,
+      isDefault: true,
+    });
 
     res.status(201).json({ message: "User Successfuly created", user: savedUser });
   } catch (error) {

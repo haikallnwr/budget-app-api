@@ -24,6 +24,10 @@ const AccountSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

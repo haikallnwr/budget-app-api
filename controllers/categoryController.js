@@ -13,8 +13,8 @@ exports.getCategories = async (req, res) => {
 };
 
 exports.createCategory = async (req, res) => {
-  const { name, type } = req.body;
   try {
+    const { name, type } = req.body;
     const category = new Category({
       user_id: req.user._id,
       name,
