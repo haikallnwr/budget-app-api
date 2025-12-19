@@ -15,7 +15,6 @@ exports.createTransaction = async (req, res) => {
     });
     await newTransaction.save();
 
-    //automatic update balance
     const account = await Account.findById(account_id);
     if (type === "Income") {
       account.current_balance += parseFloat(amount);
